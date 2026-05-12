@@ -131,7 +131,7 @@ export default class GherkinInMarkdownTokenMatcher implements ITokenMatcher<Toke
     if (result) {
       token.matchedType = TokenType.Empty
     }
-    return this.setTokenMatched(token, null, result)
+    return this.setTokenMatched(token, 0, result)
   }
 
   match_Other(token: Token): boolean {
@@ -143,12 +143,14 @@ export default class GherkinInMarkdownTokenMatcher implements ITokenMatcher<Toke
   }
 
   match_Comment(token: Token): boolean {
-    let result = false
     if (token.line.startsWith('|')) {
       const tableCells = token.line.getTableCells()
-      if (this.isGfmTableSeparator(tableCells)) result = true
+      if (this.isGfmTableSeparator(tableCells)) {
+        token.matchedType = TokenType.Empty
+        return this.setTokenMatched(token, 0, true)
+      }
     }
-    return this.setTokenMatched(token, null, result)
+    return this.setTokenMatched(token, null, false)
   }
 
   match_DocStringSeparator(token: Token) {
@@ -304,7 +306,7 @@ export default class GherkinInMarkdownTokenMatcher implements ITokenMatcher<Toke
   }
 
   match_TableRow(token: Token): boolean {
-    // Gherkin tables must be indented 2-5 spaces in order to be distinguidedn from non-Gherkin tables
+    // Gherkin tables must be indented 2-5 spaces in order to be distinguished from non-Gherkin tables
     if (token.line.lineText.match(/^\s\s\s?\s?\s?\|/)) {
       const tableCells = token.line.getTableCells()
       if (this.isGfmTableSeparator(tableCells)) return false
@@ -312,7 +314,7 @@ export default class GherkinInMarkdownTokenMatcher implements ITokenMatcher<Toke
       token.matchedKeyword = '|'
       token.matchedType = TokenType.TableRow
       token.matchedItems = tableCells
-      return true
+      return this.setTokenMatched(token, null, true)
     }
     return false
   }
@@ -341,7 +343,7 @@ export default class GherkinInMarkdownTokenMatcher implements ITokenMatcher<Toke
     if (tags.length === 0) return false
     token.matchedType = TokenType.TagLine
     token.matchedItems = tags
-    return true
+    return this.setTokenMatched(token, null, true)
   }
 
   reset(): void {
