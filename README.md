@@ -39,23 +39,10 @@ for a new programming language. Our wish-list is (in no particular order):
 
 ## Usage
 
-Gherkin can be used either through its command line interface (CLI) or as a
-library.
+Gherkin is a library designed to be used in conjunction with other tools such as
+Cucumber which consumes [Cucumber Messages](https://github.com/cucumber/messages).
 
-It is designed to be used in conjunction with other tools such as Cucumber
-which consumes the output from the CLI or library as [Cucumber Messages](https://github.com/cucumber/messages).
-
-### Library
-
-Using the library is the preferred way to use Gherkin since it produces easily
-consumable AST and Pickle objects in-process without having to fork a CLI process
-or parse JSON.
-
-The library itself provides a _stream_ API, which is what the CLI is based on.
-This is the recommended way to use the library as it provides a high level API
-that is easy to use. See the CLI implementations to get an idea of how to use it.
-
-Alternatively, you can use the lower level parser and compiler. Some usage examples are below:
+The parser and compiler can be used directly. Some usage examples are below:
 
 #### Java
 
@@ -159,30 +146,6 @@ $path = '/path/to/my.feature';
 
 $parser = new GherkinParser();
 $pickles = $parser->parseString(uri: $path, data: file_get_contents($path));
-```
-
-### CLI
-
-The Gherkin CLI `gherkin` reads Gherkin source files (`.feature` files) and outputs
-[ASTs](#abstract-syntax-tree-ast) and [Pickles](#pickles).
-
-The `gherkin` program takes any number of files as arguments and prints the results
-to `STDOUT` as [Newline Delimited JSON](https://jsonlines.org).
-
-Each line is a JSON document that conforms to the [Cucumber Event Protocol](https://github.com/cucumber/messages).
-
-To try it out, just install Gherkin for your favourite language, and run it over the
-files in this repository:
-
-```console
-gherkin testdata/**/*.feature
-```
-
-Ndjson is easy to read for programs, but hard for people. To pretty print each JSON
-document you can pipe it to the [jq](https://stedolan.github.io/jq/) program:
-
-```console
-gherkin testdata/**/*.feature | jq
 ```
 
 ## Table cell escaping
@@ -370,13 +333,7 @@ Feature:
       | n |
 ```
 
-Using the [CLI](#cli) we can compile this into several pickle objects:
-
-```console
-gherkin testdata/good/readme_example.feature --no-source --no-ast | jq
-```
-
-Output:
+Compiling the above feature file produces the following pickle objects:
 
 ```json
 {
